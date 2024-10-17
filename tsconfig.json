@@ -1,8 +1,7 @@
 {
-  "files": [],
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "ESNext",
     "lib": ["ES2020"],
     "esModuleInterop": true,
     "moduleResolution": "node",
@@ -11,9 +10,5 @@
     "outDir": "dist"
   },
   "include": ["api/**/*.ts"],
-  "exclude": ["node_modules"],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "exclude": ["node_modules"]
 }
