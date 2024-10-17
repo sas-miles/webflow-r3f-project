@@ -1,4 +1,3 @@
-// /api/updateContent.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Redis } from "@upstash/redis";
 import fetch from "node-fetch";
@@ -11,6 +10,9 @@ const redis = new Redis({
 export default async (req: VercelRequest, res: VercelResponse) => {
   if (req.method === "POST") {
     try {
+      // Log when the function starts processing
+      console.log("Processing Webflow API request...");
+
       // Fetch data from Webflow API
       const response = await fetch(
         `https://api.webflow.com/v2/collections/67117b2ed6ce0b4be535a00c/items/67117b5d4d54c974f5933783`,
@@ -23,17 +25,27 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       );
 
       if (!response.ok) {
-        throw new Error(`Webflow API error: ${response.statusText}`);
+        const errorMessage = await response.text();
+        throw new Error(
+          `Webflow API error: ${response.status} - ${errorMessage}`,
+        );
       }
 
       const data = await response.json();
 
-      // Store the data in Redis
-      await redis.set("webflow:content", JSON.stringify(data));
+      // Set a TTL for Redis (1 hour in this case)
+      const ttlInSeconds = 3600;
+      await redis.set("webflow:content", JSON.stringify(data), {
+        ex: ttlInSeconds,
+      });
+
+      // Log when the data is successfully cached
+      console.log("Content successfully updated in Redis");
 
       // Respond to the webhook
       res.status(200).send("Content updated");
     } catch (error) {
+      // Log any error that occurs during the process
       console.error("Error updating content:", error);
       res.status(500).send("Internal Server Error");
     }

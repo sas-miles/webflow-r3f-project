@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 
 interface Item {
@@ -24,6 +25,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log("Fetching content...");
     fetch("https://webflow-r3f-project.vercel.app/api/getContent")
       .then((response) => response.json())
       .then((data: WebflowData) => setContentData(data.items))
