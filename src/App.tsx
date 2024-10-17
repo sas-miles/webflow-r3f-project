@@ -24,7 +24,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("https://your-vercel-app.vercel.app/api/getContent")
+    fetch("https://webflow-r3f-project.vercel.app/api/getContent")
       .then((response) => response.json())
       .then((data: WebflowData) => setContentData(data.items))
       .catch((error) => {
