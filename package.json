@@ -16,6 +16,7 @@
     "@upstash/redis": "^1.34.3",
     "@vercel/node": "^3.2.23",
     "framer-motion": "^11.11.8",
+    "node-fetch": "^3.3.2",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "react": "^18.3.1",
