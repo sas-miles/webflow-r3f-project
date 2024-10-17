@@ -17,7 +17,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
         {
           headers: {
             Authorization: `Bearer ${process.env.WEBFLOW_API_KEY}`,
-            "accept-version": "1.0.0",
+            "accept-version": "2.0.0",
           },
         },
       );
