@@ -15,7 +15,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
       // Fetch data from Webflow API
       const response = await fetch(
-        `https://api.webflow.com/v2/collections/67117b2ed6ce0b4be535a00c/items/67117b5d4d54c974f5933783`,
+        `https://api.webflow.com/v2/collections/67117b2ed6ce0b4be535a00c/items/6712cd8187ee8f16ad401b72`,
         {
           headers: {
             Authorization: `Bearer ${process.env.WEBFLOW_API_KEY}`,
