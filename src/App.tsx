@@ -1,52 +1,87 @@
-import React from "react";
-import { useEffect, useState } from "react";
-
-interface Item {
-  _id: string;
-  name: string;
-  description?: string;
-  [key: string]: any;
-}
+import React, { useEffect, useState } from "react";
+import DOMPurify from "dompurify";
+import { Canvas } from "@react-three/fiber";
+import { City } from "./components/city";
+import { Html, OrbitControls, Stage } from "@react-three/drei";
 
 interface WebflowData {
-  items: Array<{
-    _id: string;
+  fieldData: {
+    "page-link": string;
+    slug: string;
     name: string;
-    [key: string]: any;
-  }>;
-  count: number;
-  limit: number;
-  offset: number;
-  total: number;
+    title: string;
+    "main-content": string;
+    "featured-image": {
+      url: string;
+      alt: string | null;
+    };
+  };
 }
 
 function App() {
-  const [contentData, setContentData] = useState<Item[] | null>(null);
+  const [contentData, setContentData] = useState<WebflowData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Fetching content...");
-    fetch("https://webflow-r3f-project.vercel.app/api/getContent")
-      .then((response) => response.json())
-      .then((data: WebflowData) => setContentData(data.items))
-      .catch((error) => {
-        console.error("Error fetching content:", error);
-        setError("Failed to load content.");
-      });
+    const cachedContent = localStorage.getItem("webflowContent");
+
+    if (cachedContent) {
+      console.log("Loading cached content...");
+      setContentData(JSON.parse(cachedContent));
+    } else {
+      console.log("Fetching content...");
+      fetch("https://webflow-r3f-project.vercel.app/api/getContent")
+        .then((response) => response.json())
+        .then((data: WebflowData) => {
+          setContentData(data);
+          localStorage.setItem("webflowContent", JSON.stringify(data)); // Cache content in localStorage
+        })
+        .catch((error) => {
+          console.error("Error fetching content:", error);
+          setError("Failed to load content.");
+        });
+    }
   }, []);
 
   if (error) return <div>{error}</div>;
   if (!contentData) return <div>Loading...</div>;
 
+  const { fieldData } = contentData;
+
   return (
-    <div>
-      {contentData.map((item) => (
-        <div key={item._id}>
-          <h1>{item.name}</h1>
-          <p>{item.description}</p>
-        </div>
-      ))}
-    </div>
+    // <>
+    //   <h1>{fieldData.title}</h1>
+    //   <div
+    //     dangerouslySetInnerHTML={{
+    //       __html: DOMPurify.sanitize(fieldData["main-content"]),
+    //     }}
+    //   />
+    //   <img
+    //     src={fieldData["featured-image"].url}
+    //     alt={fieldData["featured-image"].alt || "Featured"}
+    //   />
+    //   <a href={fieldData["page-link"]}>Read More</a>
+    // </>
+    <>
+      <Canvas>
+        <OrbitControls />
+
+        <Stage>
+          <Html>
+            <div className="flex flex-col items-center justify-center">
+              <h1 className="text-4xl font-bold text-red-500">
+                {fieldData.title}
+              </h1>
+              <img
+                src={fieldData["featured-image"].url}
+                alt={fieldData["featured-image"].alt || "Featured"}
+              />
+            </div>
+          </Html>
+          <City />
+        </Stage>
+      </Canvas>
+    </>
   );
 }
 
