@@ -897,7 +897,7 @@ type GLTFResult = GLTF & {
 export function City(props: JSX.IntrinsicElements["group"]) {
   const { nodes, materials } = useGLTF(
     "https://webflow-public-assets.s3.amazonaws.com/testing/low_poly_city.glb",
-  ) as GLTFResult;
+  ) as unknown as GLTFResult;
   return (
     <group {...props} dispose={null}>
       <group scale={0.01}>
@@ -909,7 +909,10 @@ export function City(props: JSX.IntrinsicElements["group"]) {
           <mesh
             castShadow
             receiveShadow
-            geometry={nodes.Casa002_Colore_0.geometry}
+            geometry={
+              nodes.Casa002_Colore_0
+                .geometry as THREE.BufferGeometry<THREE.NormalBufferAttributes>
+            }
             material={materials.Colore}
           />
           <mesh

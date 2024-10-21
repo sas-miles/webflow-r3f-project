@@ -1,14 +1,43 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "lib": ["ES2020"],
+    /* Base Options: */
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "skipLibCheck": true,
+
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+
+    /* Bundled projects */
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "jsx": "preserve",
     "strict": true,
-    "types": ["@types/node"],
-    "outDir": "dist"
+    "incremental": true,
+
+    "outDir": "dist",
+
+    /* Path Aliases */
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
-  "include": ["api/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    ".eslintrc.cjs",
+    "next-env.d.ts",
+    "src/shared/lib/theatre/initializeTheatre.ts",
+    "src/shared/types/navigationTypes.ts",
+    "src/shared/types/webflow.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.cjs",
+    "**/*.js"
+  ],
+  "exclude": ["node_modules", "template"]
 }
