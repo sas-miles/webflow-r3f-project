@@ -1,19 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigationStore } from "~/features/zustandStore/navigationStore";
-import type { PointOfInterest as POIType } from "../types";
 
-import { POINTS_OF_INTEREST } from "~/features/pointsOfInterest/lib/poiConfig";
-import { usePointContent } from "../hooks/usePointsContent";
-
-interface PointOfInterestProps {
-  poi: POIType;
-  onClick?: () => void;
-}
-
-function SchoolView({ poi }: PointOfInterestProps) {
+function SchoolView() {
   const { isAnimating, currentScreen, setTargetScreen } = useNavigationStore();
-  const { content, isLoading, error } = usePointContent(poi);
 
   return (
     <motion.section
@@ -42,7 +32,7 @@ function SchoolView({ poi }: PointOfInterestProps) {
             },
           }}
         >
-          {content?.fieldData.title}
+          My School
         </motion.h1>
         <motion.p
           className="mt-2"
@@ -61,7 +51,11 @@ function SchoolView({ poi }: PointOfInterestProps) {
             },
           }}
         >
-          blurb
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam quae
+          voluptatum, quia, quibusdam, voluptates voluptate quos quod
+          voluptatibus quas doloribus quidem. Quisquam quae voluptatum, quia,
+          quibusdam, voluptates voluptate quos quod voluptatibus quas doloribus
+          quidem.
         </motion.p>
         <motion.button
           onClick={() => setTargetScreen("Main")}
