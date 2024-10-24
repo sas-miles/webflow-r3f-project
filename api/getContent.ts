@@ -1,54 +1,66 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Redis } from "@upstash/redis";
+import fetch from "node-fetch";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-const allowedOrigins = ["https://full-r3f.webflow.io"];
+// Define the IDs we're working with
+const COLLECTION_ID = "67117b2ed6ce0b4be535a00c";
+const ITEM_ID = "6712cd8187ee8f16ad401b72";
 
 export default async (req: VercelRequest, res: VercelResponse) => {
-  const origin = req.headers.origin;
-
-  const safeOrigin = origin || "null";
-  if (allowedOrigins.includes(safeOrigin)) {
-    res.setHeader("Access-Control-Allow-Origin", safeOrigin);
-  } else {
-    res.setHeader("Access-Control-Allow-Origin", "null");
-  }
-
-  if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    res.status(204).end();
-    return;
-  }
-
-  const { collectionId, itemId } = req.query;
-
-  if (!collectionId || !itemId) {
-    return res.status(400).json({ error: "Missing collectionId or itemId" });
-  }
-
-  if (req.method === "GET") {
+  if (req.method === "POST") {
     try {
-      const cacheKey = `webflow:${collectionId}:${itemId}`;
-      const cachedData = await redis.get(cacheKey);
+      // Log when the function starts processing
+      console.log("Processing Webflow API request...");
 
-      if (cachedData) {
-        res.setHeader("Content-Type", "application/json");
-        res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
-        res.status(200).send(cachedData);
-      } else {
-        res.status(503).json({ error: "Content not available" });
+      // Fetch data from Webflow API
+      const response = await fetch(
+        `https://api.webflow.com/v2/collections/${COLLECTION_ID}/items/${ITEM_ID}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.WEBFLOW_API_KEY}`,
+            "accept-version": "2.0.0",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(
+          `Webflow API error: ${response.status} - ${errorMessage}`,
+        );
       }
+
+      const data = await response.json();
+
+      // Use the same cache key format as getContent.ts
+      const cacheKey = `webflow:${COLLECTION_ID}:${ITEM_ID}`;
+      const ttlInSeconds = 3600;
+
+      await redis.set(cacheKey, JSON.stringify(data), {
+        ex: ttlInSeconds,
+      });
+
+      // Log when the data is successfully cached
+      console.log(
+        `Content successfully updated in Redis with key: ${cacheKey}`,
+      );
+
+      // Respond to the webhook
+      res.status(200).send("Content updated");
     } catch (error) {
-      console.error("Error fetching content:", error);
-      res.status(500).send("Internal Server Error");
+      // Log any error that occurs during the process
+      console.error("Error updating content:", error);
+      res.status(500).json({
+        error: "Internal Server Error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   } else {
-    res.setHeader("Allow", "GET, OPTIONS");
     res.status(405).send("Method Not Allowed");
   }
 };
