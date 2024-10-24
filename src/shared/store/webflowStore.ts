@@ -1,20 +1,23 @@
 import { create } from "zustand";
-import { WebflowData } from "../types/webflow";
+import { WebflowData } from "~/shared/types/webflow";
 
 interface WebflowStore {
-  content: WebflowData | null;
+  contentMap: Map<string, WebflowData>;
   error: string | null;
   isLoading: boolean;
-  setContent: (content: WebflowData) => void;
+  setContent: (itemId: string, content: WebflowData) => void;
   setError: (error: string | null) => void;
   setIsLoading: (isLoading: boolean) => void;
 }
 
 export const useWebflowStore = create<WebflowStore>((set) => ({
-  content: null,
+  contentMap: new Map(),
   error: null,
   isLoading: false,
-  setContent: (content) => set({ content }),
+  setContent: (itemId, content) =>
+    set((state) => ({
+      contentMap: new Map(state.contentMap).set(itemId, content),
+    })),
   setError: (error) => set({ error }),
   setIsLoading: (isLoading) => set({ isLoading }),
 }));

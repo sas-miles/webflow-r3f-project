@@ -1,4 +1,3 @@
-// /api/getContent.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Redis } from "@upstash/redis";
 
@@ -7,11 +6,9 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-// List of allowed origins
 const allowedOrigins = ["https://full-r3f.webflow.io"];
 
 export default async (req: VercelRequest, res: VercelResponse) => {
-  // Get the origin of the request
   const origin = req.headers.origin;
 
   const safeOrigin = origin || "null";
@@ -22,17 +19,22 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   }
 
   if (req.method === "OPTIONS") {
-    // Handle preflight OPTIONS request
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.status(204).end();
     return;
   }
 
+  const { collectionId, itemId } = req.query;
+
+  if (!collectionId || !itemId) {
+    return res.status(400).json({ error: "Missing collectionId or itemId" });
+  }
+
   if (req.method === "GET") {
     try {
-      // Retrieve the data from Redis
-      const cachedData = await redis.get("webflow:content");
+      const cacheKey = `webflow:${collectionId}:${itemId}`;
+      const cachedData = await redis.get(cacheKey);
 
       if (cachedData) {
         res.setHeader("Content-Type", "application/json");

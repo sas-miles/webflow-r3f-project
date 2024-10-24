@@ -11,3 +11,8 @@ export interface WebflowData {
     };
   };
 }
+
+export interface PointOfInterest {
+  id: string;
+  collectionId: string;
+}
