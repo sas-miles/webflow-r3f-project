@@ -6,7 +6,6 @@ import AnimationControls from "~/features/experience/components/AnimationControl
 import { SheetProvider } from "@theatre/r3f";
 import { initializeTheatre } from "~/shared/lib/theatre/initializeTheatre";
 import UI from "~/features/pointsOfInterest/components/UI";
-import Content from "~/features/pointsOfInterest/components/Content";
 
 const project = initializeTheatre();
 const mainSheet = project.sheet("Main");
